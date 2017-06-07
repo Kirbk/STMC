@@ -1,8 +1,5 @@
 #include "MainMenuScreen.h"
 
-#include "ScreenIndices.h"
-
-
 MainMenuScreen::MainMenuScreen(Engine::Window* window) : m_window(window)
 {
 	m_screenIndex = SCREEN_INDEX_MAINMENU;
@@ -15,12 +12,12 @@ MainMenuScreen::~MainMenuScreen()
 
 int MainMenuScreen::getNextScreenIndex() const
 {
-	return SCREEN_INDEX_GAMEPLAY;
+	return m_nextScreenIndex;
 }
 
 int MainMenuScreen::getPreviousScreenIndex() const
 {
-	return SCREEN_INDEX_FOR_NO_SCREEN;
+	return SCREEN_INDEX_NO_SCREEN;
 }
 
 void MainMenuScreen::build()
@@ -67,11 +64,15 @@ void MainMenuScreen::initUI()
 	m_gui.setFont("DejaVuSans-10");
 
 	CEGUI::PushButton* startGameButton = static_cast<CEGUI::PushButton*>(m_gui.createWidget("AlfiskoSkin/Button", glm::vec4(0.45f, 0.5f, 0.1f, 0.05f), glm::vec4(0), "StartGame"));
-	startGameButton->setText("Start Game!");
+	startGameButton->setText("Start Game");
 	startGameButton->subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&MainMenuScreen::onNewGameClicked, this));
 
-	CEGUI::PushButton* exitGameButton = static_cast<CEGUI::PushButton*>(m_gui.createWidget("AlfiskoSkin/Button", glm::vec4(0.45f, 0.55f, 0.1f, 0.05f), glm::vec4(0), "ExitGame"));
-	exitGameButton->setText("Exit Game!");
+	CEGUI::PushButton* editorButton = static_cast<CEGUI::PushButton*>(m_gui.createWidget("AlfiskoSkin/Button", glm::vec4(0.45f, 0.55f, 0.1f, 0.05f), glm::vec4(0), "Editor"));
+	editorButton->setText("Level Editor");
+	editorButton->subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&MainMenuScreen::onEditorClicked, this));
+
+	CEGUI::PushButton* exitGameButton = static_cast<CEGUI::PushButton*>(m_gui.createWidget("AlfiskoSkin/Button", glm::vec4(0.45f, 0.6f, 0.1f, 0.05f), glm::vec4(0), "ExitGame"));
+	exitGameButton->setText("Exit Game");
 	exitGameButton->subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&MainMenuScreen::onExitClicked, this));
 
 
@@ -85,11 +86,23 @@ void MainMenuScreen::checkInput()
 	SDL_Event evnt;
 	while (SDL_PollEvent(&evnt)) {
 		m_gui.onSDLEvent(evnt);
+
+		if (evnt.type == SDL_QUIT) {
+			m_currentState = Engine::ScreenState::EXIT_APPLICATION;
+		}
 	}
 }
 
 bool MainMenuScreen::onNewGameClicked(const CEGUI::EventArgs & e)
 {
+	m_nextScreenIndex = SCREEN_INDEX_GAMEPLAY;
+	m_currentState = Engine::ScreenState::CHANGE_NEXT;
+	return true;
+}
+
+bool MainMenuScreen::onEditorClicked(const CEGUI::EventArgs & e)
+{
+	m_nextScreenIndex = SCREEN_INDEX_EDITOR;
 	m_currentState = Engine::ScreenState::CHANGE_NEXT;
 	return true;
 }

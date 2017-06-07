@@ -20,7 +20,7 @@ GameplayScreen::~GameplayScreen()
 }
 
 int GameplayScreen::getNextScreenIndex() const {
-	return SCREEN_INDEX_FOR_NO_SCREEN;
+	return SCREEN_INDEX_NO_SCREEN;
 }
 
 int GameplayScreen::getPreviousScreenIndex() const {

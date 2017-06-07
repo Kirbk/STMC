@@ -13,11 +13,11 @@
 
 #include "ScreenIndices.h"
 
-class MainMenuScreen : public Engine::IGameScreen
+class EditorScreen : public Engine::IGameScreen
 {
 public:
-	MainMenuScreen(Engine::Window* window);
-	~MainMenuScreen();
+	EditorScreen(Engine::Window* window);
+	~EditorScreen();
 
 	// Inherited via IGameScreen
 	virtual int getNextScreenIndex() const override;
@@ -32,11 +32,12 @@ public:
 private:
 	void initUI();
 	void checkInput();
-	bool onNewGameClicked(const CEGUI::EventArgs& e);
-	bool onEditorClicked(const CEGUI::EventArgs& e);
 	bool onExitClicked(const CEGUI::EventArgs& e);
 
-	int m_nextScreenIndex = SCREEN_INDEX_GAMEPLAY;
+	float m_colorPickerRed = 255.0f;
+	float m_colorPickerGreen = 255.0f;
+	float m_colorPickerBlue = 255.0f;
+
 	Engine::Camera2D m_camera;
 	Engine::Window* m_window;
 	Engine::GUI m_gui;
