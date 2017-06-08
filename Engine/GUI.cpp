@@ -1,30 +1,35 @@
+#include <glew.h> // Include BEFORE GUI.h
+
 #include "GUI.h"
+
+#include <iostream>
+
 #include <SDL_timer.h>
 
-
 namespace Engine {
+
 	CEGUI::OpenGL3Renderer* GUI::m_renderer = nullptr;
 
 	void GUI::init(const std::string& resourceDirectory) {
 		// Check if the renderer and system were not already initialized
 		if (m_renderer == nullptr) {
 			m_renderer = &CEGUI::OpenGL3Renderer::bootstrapSystem();
-
-			CEGUI::DefaultResourceProvider* rp = static_cast<CEGUI::DefaultResourceProvider*>(CEGUI::System::getSingleton().getResourceProvider());
-			rp->setResourceGroupDirectory("imagesets", resourceDirectory + "/imagesets/");
-			rp->setResourceGroupDirectory("schemes", resourceDirectory + "/schemes/");
-			rp->setResourceGroupDirectory("fonts", resourceDirectory + "/fonts/");
-			rp->setResourceGroupDirectory("layouts", resourceDirectory + "/layouts/");
-			rp->setResourceGroupDirectory("looknfeels", resourceDirectory + "/looknfeel/");
-			rp->setResourceGroupDirectory("lua_scripts", resourceDirectory + "/lua_scripts/");
-
-			CEGUI::ImageManager::setImagesetDefaultResourceGroup("imagesets");
-			CEGUI::Scheme::setDefaultResourceGroup("schemes");
-			CEGUI::Font::setDefaultResourceGroup("fonts");
-			CEGUI::WidgetLookManager::setDefaultResourceGroup("looknfeels");
-			CEGUI::WindowManager::setDefaultResourceGroup("layouts");
-			CEGUI::ScriptModule::setDefaultResourceGroup("lua_scripts");
 		}
+
+		CEGUI::DefaultResourceProvider* rp = static_cast<CEGUI::DefaultResourceProvider*>(CEGUI::System::getSingleton().getResourceProvider());
+		rp->setResourceGroupDirectory("imagesets", resourceDirectory + "/imagesets/");
+		rp->setResourceGroupDirectory("schemes", resourceDirectory + "/schemes/");
+		rp->setResourceGroupDirectory("fonts", resourceDirectory + "/fonts/");
+		rp->setResourceGroupDirectory("layouts", resourceDirectory + "/layouts/");
+		rp->setResourceGroupDirectory("looknfeels", resourceDirectory + "/looknfeel/");
+		rp->setResourceGroupDirectory("lua_scripts", resourceDirectory + "/lua_scripts/");
+
+		CEGUI::ImageManager::setImagesetDefaultResourceGroup("imagesets");
+		CEGUI::Scheme::setDefaultResourceGroup("schemes");
+		CEGUI::Font::setDefaultResourceGroup("fonts");
+		CEGUI::WidgetLookManager::setDefaultResourceGroup("looknfeels");
+		CEGUI::WindowManager::setDefaultResourceGroup("layouts");
+		CEGUI::ScriptModule::setDefaultResourceGroup("lua_scripts");
 
 		m_context = &CEGUI::System::getSingleton().createGUIContext(m_renderer->getDefaultRenderTarget());
 		m_root = CEGUI::WindowManager::getSingleton().createWindow("DefaultWindow", "root");
@@ -33,17 +38,28 @@ namespace Engine {
 
 	void GUI::destroy() {
 		CEGUI::System::getSingleton().destroyGUIContext(*m_context);
+		CEGUI::WindowManager::getSingleton().destroyWindow(m_root);
+		m_context = nullptr;
+		m_root = nullptr;
 	}
 
 	void GUI::draw() {
+		glDisable(GL_DEPTH_TEST);
 		m_renderer->beginRendering();
 		m_context->draw();
 		m_renderer->endRendering();
+		// Clean up after CEGUI
+		glBindVertexArray(0);
 		glDisable(GL_SCISSOR_TEST);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glBindTexture(GL_TEXTURE_2D, 0);
+		glDisableClientState(GL_VERTEX_ARRAY);
+		glDisableClientState(GL_COLOR_ARRAY);
+		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 	}
 
-	void GUI::update()
-	{
+	void GUI::update() {
 		unsigned int elapsed;
 		if (m_lastTime == 0) {
 			elapsed = 0;
@@ -51,45 +67,27 @@ namespace Engine {
 		}
 		else {
 			unsigned int nextTime = SDL_GetTicks();
-			elapsed = nextTime = m_lastTime;
+			elapsed = nextTime - m_lastTime;
 			m_lastTime = nextTime;
 		}
-
 		m_context->injectTimePulse((float)elapsed / 1000.0f);
 	}
 
-	void GUI::setMouseCursor(const std::string & imageFile)
-	{
+	void GUI::setMouseCursor(const std::string& imageFile) {
 		m_context->getMouseCursor().setDefaultImage(imageFile);
 	}
 
-	void GUI::showMouseCursor()
-	{
+	void GUI::showMouseCursor() {
 		m_context->getMouseCursor().show();
 	}
 
-	void GUI::hideMouseCursor()
-	{
+	void GUI::hideMouseCursor() {
 		m_context->getMouseCursor().hide();
 	}
 
-	CEGUI::MouseButton SDLButtonToCEGUIButton(Uint8 sdlButton)
-	{
-		switch (sdlButton) {
-		case SDL_BUTTON_LEFT:	return CEGUI::MouseButton::LeftButton;
-		case SDL_BUTTON_MIDDLE:	return CEGUI::MouseButton::MiddleButton;
-		case SDL_BUTTON_RIGHT:	return CEGUI::MouseButton::RightButton;
-		case SDL_BUTTON_X1:		return CEGUI::MouseButton::X1Button;
-		case SDL_BUTTON_X2:		return CEGUI::MouseButton::X2Button;
-		}
-		return CEGUI::MouseButton::NoButton;
-	}
-
-	CEGUI::Key::Scan SDLKeyToCEGUIKey(SDL_Keycode key)
-	{
+	CEGUI::Key::Scan SDLKeyToCEGUIKey(SDL_Keycode key) {
 		using namespace CEGUI;
-		switch (key)
-		{
+		switch (key) {
 		case SDLK_BACKSPACE:    return Key::Backspace;
 		case SDLK_TAB:          return Key::Tab;
 		case SDLK_RETURN:       return Key::Return;
@@ -143,16 +141,6 @@ namespace Engine {
 		case SDLK_y:            return Key::Y;
 		case SDLK_z:            return Key::Z;
 		case SDLK_DELETE:       return Key::Delete;
-		case SDLK_KP_0:          return Key::Numpad0;
-		case SDLK_KP_1:          return Key::Numpad1;
-		case SDLK_KP_2:          return Key::Numpad2;
-		case SDLK_KP_3:          return Key::Numpad3;
-		case SDLK_KP_4:          return Key::Numpad4;
-		case SDLK_KP_5:          return Key::Numpad5;
-		case SDLK_KP_6:          return Key::Numpad6;
-		case SDLK_KP_7:          return Key::Numpad7;
-		case SDLK_KP_8:          return Key::Numpad8;
-		case SDLK_KP_9:          return Key::Numpad9;
 		case SDLK_KP_PERIOD:    return Key::Decimal;
 		case SDLK_KP_DIVIDE:    return Key::Divide;
 		case SDLK_KP_MULTIPLY:  return Key::Multiply;
@@ -197,13 +185,23 @@ namespace Engine {
 		}
 	}
 
-	void GUI::onSDLEvent(SDL_Event & evnt)
-	{
-		CEGUI::utf32 codePoint;
+	CEGUI::MouseButton SDLButtonToCEGUIButton(Uint8 sdlButton) {
+		switch (sdlButton) {
+		case SDL_BUTTON_LEFT: return CEGUI::MouseButton::LeftButton;
+		case SDL_BUTTON_MIDDLE: return CEGUI::MouseButton::MiddleButton;
+		case SDL_BUTTON_RIGHT: return CEGUI::MouseButton::RightButton;
+		case SDL_BUTTON_X1: return CEGUI::MouseButton::X1Button;
+		case SDL_BUTTON_X2: return CEGUI::MouseButton::X2Button;
+		}
+		return CEGUI::MouseButton::NoButton;
+	}
 
+	void GUI::onSDLEvent(SDL_Event& evnt) {
+		CEGUI::utf32 codePoint;
 		switch (evnt.type) {
 		case SDL_MOUSEMOTION:
-			m_context->injectMousePosition(evnt.motion.x, evnt.motion.y);
+			// m_context->injectMouseMove(evnt.motion.xrel, evnt.motion.yrel);
+			m_context->injectMousePosition((float)evnt.motion.x, (float)evnt.motion.y);
 			break;
 		case SDL_KEYDOWN:
 			m_context->injectKeyDown(SDLKeyToCEGUIKey(evnt.key.keysym.sym));
@@ -213,8 +211,20 @@ namespace Engine {
 			break;
 		case SDL_TEXTINPUT:
 			codePoint = 0;
+			// TODO: This is wrong! We need to decode utf-8 and convert to utf-32.
+			// Thanks to Spartan190 for figuring this out. You need to get a utf conversion library
+			// or function that can convert the text, such as from UTF8-CPP: http://utfcpp.sourceforge.net/
+			// If you use UTF8-CPP just use this code and it should work:
+
+			// std::string evntText = std::string(evnt.text.text);
+			// std::vector<int> utf32result;
+			// case SDL_TEXTINPUT:
+			//   utf8::utf8to32(evnt.text.text, evnt.text.text + evntText.size(), std::back_inserter(utf32result));
+			//   codePoint = (CEGUI::utf32)utf32result[0];
+			//   m_context->injectChar(codePoint);
+
 			for (int i = 0; evnt.text.text[i] != '\0'; i++) {
-				codePoint |= ((CEGUI::utf32)*(unsigned char*)(evnt.text.text[i]) << (i * 8));
+				codePoint |= (((CEGUI::utf32)*(unsigned char*)&evnt.text.text[i]) << (i * 8));
 			}
 			m_context->injectChar(codePoint);
 			break;
@@ -234,6 +244,13 @@ namespace Engine {
 	CEGUI::Window* GUI::createWidget(const std::string& type, const glm::vec4& destRectPerc, const glm::vec4& destRectPix, const std::string& name /*= ""*/) {
 		CEGUI::Window* newWindow = CEGUI::WindowManager::getSingleton().createWindow(type, name);
 		m_root->addChild(newWindow);
+		setWidgetDestRect(newWindow, destRectPerc, destRectPix);
+		return newWindow;
+	}
+
+	CEGUI::Window* GUI::createWidget(CEGUI::Window* parent, const std::string& type, const glm::vec4& destRectPerc, const glm::vec4& destRectPix, const std::string& name /*= ""*/) {
+		CEGUI::Window* newWindow = CEGUI::WindowManager::getSingleton().createWindow(type, name);
+		parent->addChild(newWindow);
 		setWidgetDestRect(newWindow, destRectPerc, destRectPix);
 		return newWindow;
 	}

@@ -1,11 +1,14 @@
 #include "SpriteBatch.h"
+
 #include <algorithm>
-#include <iostream>
 
-namespace Engine {
+namespace Engine{
 
-	Glyph::Glyph(const glm::vec4& destRect, const glm::vec4& uvRect, GLuint Texture, float Depth, const ColorRGBA8& color) : 
-		texture(Texture), depth(Depth) {
+
+	Glyph::Glyph(const glm::vec4& destRect, const glm::vec4& uvRect, GLuint Texture, float Depth, const ColorRGBA8& color) :
+		texture(Texture),
+		depth(Depth) {
+
 		topLeft.color = color;
 		topLeft.setPosition(destRect.x, destRect.y + destRect.w);
 		topLeft.setUV(uvRect.x, uvRect.y + uvRect.w);
@@ -24,19 +27,18 @@ namespace Engine {
 	}
 
 	Glyph::Glyph(const glm::vec4& destRect, const glm::vec4& uvRect, GLuint Texture, float Depth, const ColorRGBA8& color, float angle) :
-		texture(Texture), depth(Depth) {
-
-		//center points about origin
+		texture(Texture),
+		depth(Depth) {
 
 		glm::vec2 halfDims(destRect.z / 2.0f, destRect.w / 2.0f);
 
-
+		// Get points centered at origin
 		glm::vec2 tl(-halfDims.x, halfDims.y);
 		glm::vec2 bl(-halfDims.x, -halfDims.y);
 		glm::vec2 br(halfDims.x, -halfDims.y);
 		glm::vec2 tr(halfDims.x, halfDims.y);
 
-		//rotate the points
+		// Rotate the points
 		tl = rotatePoint(tl, angle) + halfDims;
 		bl = rotatePoint(bl, angle) + halfDims;
 		br = rotatePoint(br, angle) + halfDims;
@@ -59,18 +61,16 @@ namespace Engine {
 		topRight.setUV(uvRect.x + uvRect.z, uvRect.y + uvRect.w);
 	}
 
-	glm::vec2 Glyph::rotatePoint(glm::vec2 pos, float angle) {
-		glm::vec2 newVector;
-		newVector.x = pos.x * cos(angle) - pos.y * sin(angle);
-		newVector.y = pos.x * sin(angle) + pos.y * cos(angle);
-
-		return newVector;
+	glm::vec2 Glyph::rotatePoint(const glm::vec2& pos, float angle) {
+		glm::vec2 newv;
+		newv.x = pos.x * cos(angle) - pos.y * sin(angle);
+		newv.y = pos.x * sin(angle) + pos.y * cos(angle);
+		return newv;
 	}
 
 	SpriteBatch::SpriteBatch() : _vbo(0), _vao(0)
 	{
 	}
-
 
 	SpriteBatch::~SpriteBatch()
 	{
@@ -80,18 +80,30 @@ namespace Engine {
 		createVertexArray();
 	}
 
-	void SpriteBatch::begin(GlyphSortType sortType) {
+	void SpriteBatch::dispose() {
+		if (_vao != 0) {
+			glDeleteVertexArrays(1, &_vao);
+			_vao = 0;
+		}
+		if (_vbo != 0) {
+			glDeleteBuffers(1, &_vbo);
+			_vbo = 0;
+		}
+	}
+
+	void SpriteBatch::begin(GlyphSortType sortType /* GlyphSortType::TEXTURE */) {
 		_sortType = sortType;
 		_renderBatches.clear();
+
+		// Makes _glpyhs.size() == 0, however it does not free internal memory.
+		// So when we later call emplace_back it doesn't need to internally call new.
 		_glyphs.clear();
-
-
 	}
 
 	void SpriteBatch::end() {
+		// Set up all pointers for fast sorting
 		_glyphPointers.resize(_glyphs.size());
-
-		for (int i = 0; i < _glyphs.size(); i++) {
+		for (size_t i = 0; i < _glyphs.size(); i++) {
 			_glyphPointers[i] = &_glyphs[i];
 		}
 
@@ -112,15 +124,16 @@ namespace Engine {
 		float angle = acos(glm::dot(right, dir));
 		if (dir.y < 0.0f) angle = -angle;
 
-
 		_glyphs.emplace_back(destRect, uvRect, texture, depth, color, angle);
 	}
 
 	void SpriteBatch::renderBatch() {
 
+		// Bind our VAO. This sets up the opengl state we need, including the 
+		// vertex attribute pointers and it binds the VBO
 		glBindVertexArray(_vao);
-		for (int i = 0; i < _renderBatches.size(); i++) {
-			//std::cout << _renderBatches[i].texture << " " << i << std::endl;
+
+		for (size_t i = 0; i < _renderBatches.size(); i++) {
 			glBindTexture(GL_TEXTURE_2D, _renderBatches[i].texture);
 
 			glDrawArrays(GL_TRIANGLES, _renderBatches[i].offset, _renderBatches[i].numVertices);
@@ -130,15 +143,21 @@ namespace Engine {
 	}
 
 	void SpriteBatch::createRenderBatches() {
-		std::vector<Vertex> vertices;
+		// This will store all the vertices that we need to upload
+		std::vector <Vertex> vertices;
+		// Resize the buffer to the exact size we need so we can treat
+		// it like an array
 		vertices.resize(_glyphPointers.size() * 6);
 
-		if (_glyphPointers.empty())
+		if (_glyphPointers.empty()) {
 			return;
+		}
 
-		int offset = 0;
-		int cv = 0; //current vertex
-		_renderBatches.emplace_back(0, 6, _glyphPointers[0]->texture);
+		int offset = 0; // current offset
+		int cv = 0; // current vertex
+
+					//Add the first batch
+		_renderBatches.emplace_back(offset, 6, _glyphPointers[0]->texture);
 		vertices[cv++] = _glyphPointers[0]->topLeft;
 		vertices[cv++] = _glyphPointers[0]->bottomLeft;
 		vertices[cv++] = _glyphPointers[0]->bottomRight;
@@ -147,15 +166,18 @@ namespace Engine {
 		vertices[cv++] = _glyphPointers[0]->topLeft;
 		offset += 6;
 
-		for (int cg = 1; cg < _glyphPointers.size(); cg++) {
+		//Add all the rest of the glyphs
+		for (size_t cg = 1; cg < _glyphPointers.size(); cg++) {
+
+			// Check if this glyph can be part of the current batch
 			if (_glyphPointers[cg]->texture != _glyphPointers[cg - 1]->texture) {
-				_renderBatches.emplace_back(offset, 6, _glyphPointers[cg /* Changed from 0 */]->texture);
-				//std::cout << offset << std::endl;
+				// Make a new batch
+				_renderBatches.emplace_back(offset, 6, _glyphPointers[cg]->texture);
 			}
 			else {
+				// If its part of the current batch, just increase numVertices
 				_renderBatches.back().numVertices += 6;
 			}
-
 			vertices[cv++] = _glyphPointers[cg]->topLeft;
 			vertices[cv++] = _glyphPointers[cg]->bottomLeft;
 			vertices[cv++] = _glyphPointers[cg]->bottomRight;
@@ -165,29 +187,35 @@ namespace Engine {
 			offset += 6;
 		}
 
+		// Bind our VBO
 		glBindBuffer(GL_ARRAY_BUFFER, _vbo);
-		//orphan the buffer
+		// Orphan the buffer (for speed)
 		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), nullptr, GL_DYNAMIC_DRAW);
-		//upload the data
+		// Upload the data
 		glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(Vertex), vertices.data());
 
+		// Unbind the VBO
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
 	}
 
 	void SpriteBatch::createVertexArray() {
-		if (_vao == 0) 
-			glGenVertexArrays(1, &_vao);
 
+		// Generate the VAO if it isn't already generated
+		if (_vao == 0) {
+			glGenVertexArrays(1, &_vao);
+		}
+
+		// Bind the VAO. All subsequent opengl calls will modify it's state.
 		glBindVertexArray(_vao);
 
-		if (_vbo == 0)
+		//G enerate the VBO if it isn't already generated
+		if (_vbo == 0) {
 			glGenBuffers(1, &_vbo);
-
+		}
 		glBindBuffer(GL_ARRAY_BUFFER, _vbo);
 
-		//Tell opengl that we want to use the first
-		//attribute array. We only need one array right
-		//now since we are only using position.
+		//Tell opengl what attribute arrays we need
 		glEnableVertexAttribArray(0);
 		glEnableVertexAttribArray(1);
 		glEnableVertexAttribArray(2);
@@ -200,9 +228,11 @@ namespace Engine {
 		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, uv));
 
 		glBindVertexArray(0);
+
 	}
 
 	void SpriteBatch::sortGlyphs() {
+
 		switch (_sortType) {
 		case GlyphSortType::BACK_TO_FRONT:
 			std::stable_sort(_glyphPointers.begin(), _glyphPointers.end(), compareBackToFront);
@@ -227,4 +257,5 @@ namespace Engine {
 	bool SpriteBatch::compareTexture(Glyph* a, Glyph* b) {
 		return (a->texture < b->texture);
 	}
+
 }

@@ -84,5 +84,7 @@ namespace Engine {
 
 		unsigned int _texID;
 	};
+
 }
+
 #endif // SpriteFont_h__

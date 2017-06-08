@@ -16,7 +16,7 @@ namespace Engine {
 	IGameScreen* ScreenList::moveNext() {
 		IGameScreen* currentScreen = getCurrent();
 
-		if (currentScreen->getNextScreenIndex() != SCREEN_INDEX_FOR_NO_SCREEN) {
+		if (currentScreen->getNextScreenIndex() != SCREEN_INDEX_NO_SCREEN) {
 			m_currentScreenIndex = currentScreen->getNextScreenIndex();
 		}
 		
@@ -26,7 +26,7 @@ namespace Engine {
 	IGameScreen* ScreenList::movePrevious() {
 		IGameScreen* currentScreen = getCurrent();
 
-		if (currentScreen->getPreviousScreenIndex() != SCREEN_INDEX_FOR_NO_SCREEN) {
+		if (currentScreen->getPreviousScreenIndex() != SCREEN_INDEX_NO_SCREEN) {
 			m_currentScreenIndex = currentScreen->getPreviousScreenIndex();
 		}
 
@@ -49,11 +49,11 @@ namespace Engine {
 			screen->destroy();
 		}
 		m_screens.resize(0);
-		m_currentScreenIndex = SCREEN_INDEX_FOR_NO_SCREEN;
+		m_currentScreenIndex = SCREEN_INDEX_NO_SCREEN;
 	}
 
 	IGameScreen* ScreenList::getCurrent() {
-		if (m_currentScreenIndex == SCREEN_INDEX_FOR_NO_SCREEN) return nullptr;
+		if (m_currentScreenIndex == SCREEN_INDEX_NO_SCREEN) return nullptr;
 		return m_screens[m_currentScreenIndex];
 	}
 }

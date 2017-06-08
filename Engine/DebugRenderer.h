@@ -1,20 +1,19 @@
 #pragma once
 
-#include "Vertex.h"
 #include "GLSLProgram.h"
+#include "Vertex.h"
 #include <glm.hpp>
 #include <vector>
 
 namespace Engine {
-
-	class DebugRenderer
-	{
+	class DebugRenderer {
 	public:
 		DebugRenderer();
 		~DebugRenderer();
 
 		void init();
 		void end();
+		void drawLine(const glm::vec2& a, const glm::vec2& b, const ColorRGBA8& color);
 		void drawBox(const glm::vec4& destRect, const ColorRGBA8& color, float angle);
 		void drawCircle(const glm::vec2& center, const ColorRGBA8& color, float radius);
 		void render(const glm::mat4& projectionMatrix, float lineWidth);
@@ -24,7 +23,6 @@ namespace Engine {
 			glm::vec2 position;
 			Engine::ColorRGBA8 color;
 		};
-
 	private:
 		Engine::GLSLProgram m_program;
 		std::vector<DebugVertex> m_verts;

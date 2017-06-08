@@ -42,6 +42,7 @@ namespace Engine{
 		float m_fps;
 		float m_height = 1024, m_width = 768;
 		std::string m_windowName = "DEFAULT";
+		unsigned int m_windowFlags = 0;
 		Window m_window;
 	};
 

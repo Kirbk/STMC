@@ -3,8 +3,6 @@
 #include "SpriteBatch.h"
 
 #include <SDL.h>
-#include <iostream>
-
 
 int closestPow2(int i) {
 	i--;
@@ -33,7 +31,6 @@ namespace Engine {
 		if (!TTF_WasInit()) {
 			TTF_Init();
 		}
-
 		TTF_Font* f = TTF_OpenFont(font, size);
 		if (f == nullptr) {
 			fprintf(stderr, "Failed to open TTF font %s\n", font);
@@ -45,7 +42,6 @@ namespace Engine {
 		_regLength = ce - cs + 1;
 		int padding = size / 8;
 
-		//std::cout << _regStart << " " << _regLength << std::endl;
 		// First neasure all the regions
 		glm::ivec4* glyphRects = new glm::ivec4[_regLength];
 		int i = 0, advance;
@@ -156,14 +152,13 @@ namespace Engine {
 		_glyphs = new CharGlyph[_regLength + 1];
 		for (i = 0; i < _regLength; i++) {
 			_glyphs[i].character = (char)(cs + i);
-			//std::cout << _glyphs[i].character << std::endl;
 			_glyphs[i].size = glm::vec2(glyphRects[i].z, glyphRects[i].w);
 			_glyphs[i].uvRect = glm::vec4(
 				(float)glyphRects[i].x / (float)bestWidth,
 				(float)glyphRects[i].y / (float)bestHeight,
 				(float)glyphRects[i].z / (float)bestWidth,
 				(float)glyphRects[i].w / (float)bestHeight
-				);
+			);
 		}
 		_glyphs[_regLength].character = ' ';
 		_glyphs[_regLength].size = _glyphs[0].size;
@@ -260,9 +255,9 @@ namespace Engine {
 			else {
 				// Check for correct glyph
 				int gi = c - _regStart;
-				if (gi < 0 || gi >= _regLength) gi = _regLength;
+				if (gi < 0 || gi >= _regLength)
+					gi = _regLength;
 				glm::vec4 destRect(tp, _glyphs[gi].size * scaling);
-				//if (c == '\u00E4') std::cout << _glyphs[gi].uvRect.x << " " << _glyphs[gi].uvRect.y << " " << _glyphs[gi].uvRect.z << " " << _glyphs[gi].uvRect.w << std::endl;
 				batch.draw(destRect, _glyphs[gi].uvRect, _texID, depth, tint);
 				tp.x += _glyphs[gi].size.x * scaling.x;
 			}

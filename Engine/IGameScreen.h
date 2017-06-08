@@ -1,6 +1,6 @@
 #pragma once
 
-#define SCREEN_INDEX_FOR_NO_SCREEN -1
+#define SCREEN_INDEX_NO_SCREEN -1
 
 namespace Engine{
 

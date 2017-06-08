@@ -93,7 +93,7 @@ namespace Engine{
 	}
 
 	bool IMainGame::initSystems() {
-		m_window.create(m_windowName, m_width, m_height, 0);
+		m_window.create(m_windowName, m_width, m_height, m_windowFlags);
 
 		return true;
 	}
