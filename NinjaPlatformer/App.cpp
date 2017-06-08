@@ -5,9 +5,10 @@
 
 App::App()
 {
-	m_width = 1024;
-	m_height = 768;
+	m_width = 1920;
+	m_height = 1080;
 	m_windowName = "Ninja Platformer";
+	m_windowFlags = Engine::WindowFlags::BORDERLESS;
 }
 
 

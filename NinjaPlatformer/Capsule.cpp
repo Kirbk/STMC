@@ -43,6 +43,13 @@ void Capsule::init(b2World* world,
 	m_fixtures[1] = m_body->CreateFixture(&circleDef);
 }
 
+void Capsule::destroy(b2World* world) {
+	if (m_body) {
+		world->DestroyBody(m_body);
+		m_body = nullptr;
+	}
+}
+
 void Capsule::drawDebug(Engine::DebugRenderer& debugRenderer) {
 	Engine::ColorRGBA8 color(255, 255, 255, 255);
 	// Draw box
@@ -53,7 +60,7 @@ void Capsule::drawDebug(Engine::DebugRenderer& debugRenderer) {
 	destRect.w = m_dimensions.y - m_dimensions.x;
 	debugRenderer.drawBox(destRect, color, m_body->GetAngle());
 
-	// Draw Circles
+	// Draw Circle
 	debugRenderer.drawCircle(glm::vec2(destRect.x + m_dimensions.x / 2.0f, destRect.y), color, m_dimensions.x / 2.0f);
 	debugRenderer.drawCircle(glm::vec2(destRect.x + m_dimensions.x / 2.0f, destRect.y + destRect.w), color, m_dimensions.x / 2.0f);
 }
