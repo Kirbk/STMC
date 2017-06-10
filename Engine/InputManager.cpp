@@ -3,13 +3,25 @@
 
 namespace Engine{
 
+	int MAX_CONTROLLERS = 4;
+
 	InputManager::InputManager() : _mouseCoords(0.0f)
 	{
+		SDL_JoystickEventState(SDL_ENABLE);
+
+		for (int i = 0; i < MAX_CONTROLLERS; i++) {
+			m_controllers.push_back(nullptr);
+		}
 	}
 
 
 	InputManager::~InputManager()
 	{
+		for (int i = 0; i < m_controllers.size(); i++) {
+			delete m_controllers[i];
+		}
+
+		m_controllers.resize(0);
 	}
 
 	void InputManager::update() {
@@ -53,6 +65,46 @@ namespace Engine{
 		}
 
 		return false;
+	}
+
+	void InputManager::buttonPressed(unsigned int buttonID)
+	{
+		m_buttonMap[buttonID] = true;
+	}
+
+	void InputManager::buttonReleased(unsigned int buttonID)
+	{
+		m_buttonMap[buttonID] = false;
+	}
+
+	bool InputManager::isButtonDown(unsigned int buttonID, unsigned int controllerIndex)
+	{
+		auto it = m_buttonMap.find(buttonID);
+	}
+
+	Controller* InputManager::addController()
+	{
+		for (int i = 0; i < MAX_CONTROLLERS; i++) {
+			if (m_controllers[i] == nullptr) {
+				Controller* c = new Controller();
+				c->index = i;
+				c->joystick = SDL_JoystickOpen(i);
+				m_controllers[i] = c;
+				return m_controllers[i];
+				delete c;
+				break;
+			}
+		}
+
+		return nullptr;
+	}
+
+	void InputManager::removeContoller(int index)
+	{
+		SDL_JoystickClose(m_controllers[index]->joystick);
+		delete m_controllers[index];
+		m_controllers[index] = nullptr;
+		std::printf("%i", index);
 	}
 
 	bool InputManager::wasKeyDown(unsigned int keyID) {

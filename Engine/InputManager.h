@@ -6,6 +6,11 @@
 
 namespace Engine{
 
+	struct Controller {
+		SDL_Joystick* joystick;
+		int index = 0;
+	};
+
 	class InputManager
 	{
 	public:
@@ -24,11 +29,20 @@ namespace Engine{
 		bool isKeyPressed(unsigned int keyID);
 		bool isScrolling() { return m_isScrolling; }
 
+		void buttonPressed(unsigned int buttonID);
+		void buttonReleased(unsigned int buttonID);
+
+		bool isButtonDown(unsigned int buttonID, unsigned int controllerIndex);
+
 		glm::vec2 getMouseCoords() const {
 			return _mouseCoords;
 		}
 
 		float getScrollAmount() const { return m_scrollAmount; }
+		Controller* addController();
+		void removeContoller(int index);
+
+		std::vector<Controller*> controllers;
 
 	private:
 		bool wasKeyDown(unsigned int keyID);
@@ -37,8 +51,12 @@ namespace Engine{
 		std::unordered_map<unsigned int, bool> _keyMap;
 		std::unordered_map<unsigned int, bool> _previousKeyMap;
 
+		std::unordered_map<unsigned int, bool> m_buttonMap;
+		std::unordered_map<unsigned int, bool> m_previousButtonMap;
+
 		glm::vec2 _mouseCoords;
 		float m_scrollAmount = 0;
+		std::vector<Controller*> m_controllers;
 	};
 
 }

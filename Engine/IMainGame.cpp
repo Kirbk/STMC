@@ -86,6 +86,11 @@ namespace Engine{
 		case SDL_MOUSEBUTTONUP:
 			inputManager.keyReleased(evnt.button.button);
 			break;
+		case SDL_JOYDEVICEADDED:
+			inputManager.addController();
+			break;
+		case SDL_JOYDEVICEREMOVED:
+			inputManager.removeContoller(evnt.jdevice.which);
 		default:
 			inputManager.setScrolling(false);
 			break;
