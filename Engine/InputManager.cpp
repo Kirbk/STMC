@@ -29,6 +29,19 @@ namespace Engine{
 		for (auto& it : _keyMap) {
 			_previousKeyMap[it.first] = it.second;
 		}
+
+		for (auto& it : m_buttonMap) {
+			m_previousButtonMap[it.first] = it.second;
+		}
+
+		for (int i = 0; i < MAX_CONTROLLERS; i++) {
+			if (m_controllers[i] != nullptr) {
+				if (!SDL_JoystickGetAttached(m_controllers[i]->joystick)) {
+					SDL_JoystickClose(m_controllers[i]->joystick);
+					m_controllers[i] = nullptr;
+				}
+			}
+		}
 	}
 
 	void InputManager::keyPressed(unsigned int keyID) {
@@ -80,6 +93,10 @@ namespace Engine{
 	bool InputManager::isButtonDown(unsigned int buttonID, unsigned int controllerIndex)
 	{
 		auto it = m_buttonMap.find(buttonID);
+		if (it != m_buttonMap.end())
+			return it->second;
+		else
+			return false;
 	}
 
 	Controller* InputManager::addController()
@@ -90,6 +107,7 @@ namespace Engine{
 				c->index = i;
 				c->joystick = SDL_JoystickOpen(i);
 				m_controllers[i] = c;
+
 				return m_controllers[i];
 				delete c;
 				break;
@@ -99,12 +117,16 @@ namespace Engine{
 		return nullptr;
 	}
 
+	// Deprecated
 	void InputManager::removeContoller(int index)
 	{
-		SDL_JoystickClose(m_controllers[index]->joystick);
-		delete m_controllers[index];
-		m_controllers[index] = nullptr;
-		std::printf("%i", index);
+		if (m_controllers[index] != nullptr) {
+			if (SDL_JoystickGetAttached(m_controllers[index]->joystick)) {
+				SDL_JoystickClose(m_controllers[index]->joystick);
+				delete m_controllers[index];
+				m_controllers[index] = nullptr;
+			}
+		}
 	}
 
 	bool InputManager::wasKeyDown(unsigned int keyID) {

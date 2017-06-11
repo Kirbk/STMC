@@ -90,7 +90,8 @@ namespace Engine{
 			inputManager.addController();
 			break;
 		case SDL_JOYDEVICEREMOVED:
-			inputManager.removeContoller(evnt.jdevice.which);
+			//inputManager.removeContoller(evnt.jdevice.which);
+			break;
 		default:
 			inputManager.setScrolling(false);
 			break;

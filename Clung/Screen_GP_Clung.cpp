@@ -66,9 +66,6 @@ void Screen_GP_Clung::onEntry()
 
 	m_items.push_back(new MedKit_Clung(20));
 	m_items.back()->init(m_world.get(), glm::vec2(6.0f, 5.0f), glm::vec2(1.0f, 0.0f), 0.0f, glm::vec2(1.0f), glm::vec2(1.0f), &m_camera, Engine::ColorRGBA8(255, 255, 255, 255));
-
-	m_game->inputManager.addController();
-	m_game->inputManager.addController();
 }
 
 void Screen_GP_Clung::onExit()
@@ -159,8 +156,8 @@ void Screen_GP_Clung::checkInput() {
 	while (SDL_PollEvent(&evnt)) {
 		m_game->onSDLEvent(evnt);
 
-		if (evnt.type == SDL_JOYBUTTONDOWN && evnt.jbutton.button == 0) {
-			std::cout << evnt.jdevice.which << std::endl;
+		if (evnt.type == SDL_JOYBUTTONDOWN) {
+			std::cout << (int)evnt.jbutton.button << std::endl;
 		}
 	}
 
