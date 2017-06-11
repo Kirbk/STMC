@@ -86,6 +86,12 @@ namespace Engine{
 		case SDL_MOUSEBUTTONUP:
 			inputManager.keyReleased(evnt.button.button);
 			break;
+		case SDL_JOYBUTTONDOWN:
+			inputManager.buttonPressed(evnt.jbutton.button, evnt.jdevice.which);
+			break;
+		case SDL_JOYBUTTONUP:
+			inputManager.buttonReleased(evnt.jbutton.button, evnt.jdevice.which);
+			break;
 		case SDL_JOYDEVICEADDED:
 			inputManager.addController();
 			break;

@@ -30,15 +30,15 @@ namespace Engine{
 			_previousKeyMap[it.first] = it.second;
 		}
 
-		for (auto& it : m_buttonMap) {
-			m_previousButtonMap[it.first] = it.second;
-		}
-
 		for (int i = 0; i < MAX_CONTROLLERS; i++) {
 			if (m_controllers[i] != nullptr) {
 				if (!SDL_JoystickGetAttached(m_controllers[i]->joystick)) {
 					SDL_JoystickClose(m_controllers[i]->joystick);
 					m_controllers[i] = nullptr;
+				}
+
+				for (auto& it : m_controllers[i]->buttonMap) {
+					m_controllers[i]->previousButtonMap[it.first] = it.second;
 				}
 			}
 		}
@@ -80,20 +80,20 @@ namespace Engine{
 		return false;
 	}
 
-	void InputManager::buttonPressed(unsigned int buttonID)
+	void InputManager::buttonPressed(unsigned int buttonID, unsigned int controllerIndex)
 	{
-		m_buttonMap[buttonID] = true;
+		m_controllers[controllerIndex]->buttonMap[buttonID] = true;
 	}
 
-	void InputManager::buttonReleased(unsigned int buttonID)
+	void InputManager::buttonReleased(unsigned int buttonID, unsigned int controllerIndex)
 	{
-		m_buttonMap[buttonID] = false;
+		m_controllers[controllerIndex]->buttonMap[buttonID] = false;
 	}
 
 	bool InputManager::isButtonDown(unsigned int buttonID, unsigned int controllerIndex)
 	{
-		auto it = m_buttonMap.find(buttonID);
-		if (it != m_buttonMap.end())
+		auto it = m_controllers[controllerIndex]->buttonMap.find(buttonID);
+		if (it != m_controllers[controllerIndex]->buttonMap.end())
 			return it->second;
 		else
 			return false;

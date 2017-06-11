@@ -9,6 +9,8 @@ namespace Engine{
 	struct Controller {
 		SDL_Joystick* joystick;
 		int index = 0;
+		std::unordered_map<unsigned int, bool> buttonMap;
+		std::unordered_map<unsigned int, bool> previousButtonMap;
 	};
 
 	class InputManager
@@ -29,8 +31,8 @@ namespace Engine{
 		bool isKeyPressed(unsigned int keyID);
 		bool isScrolling() { return m_isScrolling; }
 
-		void buttonPressed(unsigned int buttonID);
-		void buttonReleased(unsigned int buttonID);
+		void buttonPressed(unsigned int buttonID, unsigned int controllerIndex);
+		void buttonReleased(unsigned int buttonID, unsigned int controllerIndex);
 
 		bool isButtonDown(unsigned int buttonID, unsigned int controllerIndex);
 
@@ -50,9 +52,6 @@ namespace Engine{
 
 		std::unordered_map<unsigned int, bool> _keyMap;
 		std::unordered_map<unsigned int, bool> _previousKeyMap;
-
-		std::unordered_map<unsigned int, bool> m_buttonMap;
-		std::unordered_map<unsigned int, bool> m_previousButtonMap;
 
 		glm::vec2 _mouseCoords;
 		float m_scrollAmount = 0;

@@ -155,10 +155,6 @@ void Screen_GP_Clung::checkInput() {
 	SDL_Event evnt;
 	while (SDL_PollEvent(&evnt)) {
 		m_game->onSDLEvent(evnt);
-
-		if (evnt.type == SDL_JOYBUTTONDOWN) {
-			std::cout << (int)evnt.jbutton.button << std::endl;
-		}
 	}
 
 	if (m_game->inputManager.isKeyPressed(SDLK_F8)) {
