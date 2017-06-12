@@ -5,12 +5,50 @@
 #include <SDL.h>
 
 namespace Engine{
+	enum class XBOX360Axes {
+		leftStickX = 0,
+		leftStickY = 1,
+		leftTrigger = 2,
+		rightStickX = 3,
+		rightStickY = 4,
+		rightTrigger = 5
+	};
+
+	enum class XBOX360Buttons
+	{
+		A = 0,
+		B = 1,
+		X = 2,
+		Y = 3,
+		LEFT_BUMPER = 4,
+		RIGHT_BUMPER = 5,
+		BACK = 6,
+		START = 7,
+		LEFT_STICK = 8,
+		RIGHT_STICK = 9
+	};
+
+	enum class XBOX360Hat {
+		MIDDLE = 0b00000000,
+		UP = 0b00000001,
+		RIGHT = 0b00000010,
+		DOWN = 0b00000100,
+		LEFT = 0b00001000
+	};
+
+	struct Axis {
+		unsigned int axisID;
+		int axisValue;
+		float deadZone;
+	};
 
 	struct Controller {
 		SDL_Joystick* joystick;
 		int index = 0;
 		std::unordered_map<unsigned int, bool> buttonMap;
 		std::unordered_map<unsigned int, bool> previousButtonMap;
+		std::vector<Axis*> axes; // Stupid but to far to turn back
+		char hat = 0;
 	};
 
 	class InputManager
@@ -44,7 +82,22 @@ namespace Engine{
 		Controller* addController();
 		void removeContoller(int index);
 
-		std::vector<Controller*> controllers;
+		Controller* getController(int index) { 
+			if (m_controllers.size() <= MAX_CONTROLLERS) {
+				return m_controllers[index];
+			}
+			else {
+				return nullptr;
+			}
+		}
+
+		void setAxisValue(unsigned int controllerIndex, unsigned int axis, int value);
+
+		void setControllerDeadZone(float value) { m_controllerDeadZone = value; }
+		const float getControllerDeadZone() const { return m_controllerDeadZone; }
+
+		void setHat(char hat, int controllerIndex);
+		bool isHatDown(char hat, int controllerIndex);
 
 	private:
 		bool wasKeyDown(unsigned int keyID);
@@ -56,6 +109,8 @@ namespace Engine{
 		glm::vec2 _mouseCoords;
 		float m_scrollAmount = 0;
 		std::vector<Controller*> m_controllers;
+		float m_controllerDeadZone = 0;
+		int MAX_CONTROLLERS = 4;
 	};
 
 }

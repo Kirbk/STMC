@@ -78,7 +78,7 @@ void Player_Clung::update(Engine::InputManager* const inputManager)
 	glm::vec2 mouseCoords = inputManager->getMouseCoords();
 	mouseCoords = m_camera->convertScreenToWorld(mouseCoords);
 
-	glm::vec2 centerPosition = glm::vec2(body->GetPosition().x, body->GetPosition().y) + glm::vec2(m_drawDims.x / 2.0f);
+	glm::vec2 centerPosition = glm::vec2(m_position.x, m_position.y);
 	m_direction = glm::normalize(mouseCoords - centerPosition);
 
 	const glm::vec2 right(1.0f, 0.0f);
@@ -95,8 +95,51 @@ void Player_Clung::update(Engine::InputManager* const inputManager)
 	if (m_health > m_maxHealth) {
 		m_health = m_maxHealth;
 	}
+
+	if (m_boundController == nullptr && inputManager->getController(0) != nullptr) {
+		bindController(0, inputManager);
+	}
+
+	if (m_boundController != nullptr) {
+		updateController(inputManager);
+	}
 }
 
 void Player_Clung::drawDebug(Engine::DebugRenderer& debugRenderer) {
 	m_circle.drawDebug(debugRenderer);
+}
+
+void Player_Clung::bindController(Engine::Controller controller, Engine::InputManager* const inputManager)
+{
+	bindController(controller.index, inputManager);
+}
+
+void Player_Clung::bindController(unsigned int controllerIndex, Engine::InputManager* const inputManager)
+{
+	if (inputManager->getController(controllerIndex) != nullptr) {
+		m_boundController = inputManager->getController(controllerIndex);
+	}
+	else {
+		std::cout << "Controller Not Found!\n";
+	}
+}
+
+void Player_Clung::updateController(Engine::InputManager* const inputManager) {
+	b2Body* body = m_circle.getBody();
+
+	if (m_boundController->axes[0]->axisValue > m_boundController->axes[0]->deadZone) {
+		body->ApplyForceToCenter(b2Vec2(m_speed * abs(m_boundController->axes[0]->axisValue / 30000.0f), 0.0f), true);
+	}
+	else if (m_boundController->axes[0]->axisValue < -m_boundController->axes[0]->deadZone) {
+		body->ApplyForceToCenter(b2Vec2(-m_speed * abs(m_boundController->axes[0]->axisValue / 30000.0f), 0.0f), true);
+	}
+
+	if (m_boundController->axes[1]->axisValue > m_boundController->axes[1]->deadZone) {
+		body->ApplyForceToCenter(b2Vec2(0.0f, -m_speed * abs(m_boundController->axes[1]->axisValue / 30000.0f)), true);
+	}
+	else if (m_boundController->axes[1]->axisValue < -m_boundController->axes[1]->deadZone) {
+		body->ApplyForceToCenter(b2Vec2(0.0f, m_speed * abs(m_boundController->axes[1]->axisValue / 30000.0f)), true);
+	}
+
+	// TODO: Directional input
 }

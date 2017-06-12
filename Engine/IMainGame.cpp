@@ -3,6 +3,7 @@
 #include "ScreenList.h"
 #include "IGameScreen.h"
 #include <iostream>
+#include <bitset>
 
 namespace Engine{
 
@@ -87,10 +88,10 @@ namespace Engine{
 			inputManager.keyReleased(evnt.button.button);
 			break;
 		case SDL_JOYBUTTONDOWN:
-			inputManager.buttonPressed(evnt.jbutton.button, evnt.jdevice.which);
+			inputManager.buttonPressed(evnt.jbutton.button, evnt.jbutton.which);
 			break;
 		case SDL_JOYBUTTONUP:
-			inputManager.buttonReleased(evnt.jbutton.button, evnt.jdevice.which);
+			inputManager.buttonReleased(evnt.jbutton.button, evnt.jbutton.which);
 			break;
 		case SDL_JOYDEVICEADDED:
 			inputManager.addController();
@@ -98,6 +99,14 @@ namespace Engine{
 		case SDL_JOYDEVICEREMOVED:
 			//inputManager.removeContoller(evnt.jdevice.which);
 			break;
+		case SDL_JOYAXISMOTION:
+			inputManager.setAxisValue(evnt.jaxis.which, evnt.jaxis.axis, evnt.jaxis.value);
+			break;
+		case SDL_JOYHATMOTION:
+		{
+			inputManager.setHat(evnt.jhat.value, evnt.jhat.which);
+			break;
+		}
 		default:
 			inputManager.setScrolling(false);
 			break;

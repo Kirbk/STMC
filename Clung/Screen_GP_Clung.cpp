@@ -66,6 +66,8 @@ void Screen_GP_Clung::onEntry()
 
 	m_items.push_back(new MedKit_Clung(20));
 	m_items.back()->init(m_world.get(), glm::vec2(6.0f, 5.0f), glm::vec2(1.0f, 0.0f), 0.0f, glm::vec2(1.0f), glm::vec2(1.0f), &m_camera, Engine::ColorRGBA8(255, 255, 255, 255));
+
+	m_game->inputManager.setControllerDeadZone(3200);
 }
 
 void Screen_GP_Clung::onExit()
@@ -156,6 +158,8 @@ void Screen_GP_Clung::checkInput() {
 	while (SDL_PollEvent(&evnt)) {
 		m_game->onSDLEvent(evnt);
 	}
+
+	
 
 	if (m_game->inputManager.isKeyPressed(SDLK_F8)) {
 		m_debug = !m_debug;

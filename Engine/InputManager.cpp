@@ -1,10 +1,9 @@
 #include "InputManager.h"
 
+#include <iostream>
+#include <bitset>
 
 namespace Engine{
-
-	int MAX_CONTROLLERS = 4;
-
 	InputManager::InputManager() : _mouseCoords(0.0f)
 	{
 		SDL_JoystickEventState(SDL_ENABLE);
@@ -18,6 +17,11 @@ namespace Engine{
 	InputManager::~InputManager()
 	{
 		for (int i = 0; i < m_controllers.size(); i++) {
+			for (int j = 0; j < m_controllers[i]->axes.size(); i++) {
+				delete m_controllers[i]->axes[j];
+			}
+
+			m_controllers[i]->axes.resize(0);
 			delete m_controllers[i];
 		}
 
@@ -36,7 +40,8 @@ namespace Engine{
 					SDL_JoystickClose(m_controllers[i]->joystick);
 					m_controllers[i] = nullptr;
 				}
-
+			}
+			if (m_controllers[i] != nullptr) {
 				for (auto& it : m_controllers[i]->buttonMap) {
 					m_controllers[i]->previousButtonMap[it.first] = it.second;
 				}
@@ -106,6 +111,7 @@ namespace Engine{
 				Controller* c = new Controller();
 				c->index = i;
 				c->joystick = SDL_JoystickOpen(i);
+				c->axes.resize(6, nullptr);
 				m_controllers[i] = c;
 
 				return m_controllers[i];
@@ -126,6 +132,39 @@ namespace Engine{
 				delete m_controllers[index];
 				m_controllers[index] = nullptr;
 			}
+		}
+	}
+
+	
+
+	void InputManager::setAxisValue(unsigned int controllerIndex, unsigned int axis, int value)
+	{
+		if (m_controllers[controllerIndex]->axes[axis] != nullptr) {
+			m_controllers[controllerIndex]->axes[axis]->axisValue = (int)value;
+
+			//std::printf("%i\n", (int) value);
+		}
+		else {
+			Axis* tempAxis = new Axis();
+			tempAxis->axisID = axis;
+			tempAxis->axisValue = value;
+			tempAxis->deadZone = m_controllerDeadZone;
+			m_controllers[controllerIndex]->axes[axis] = tempAxis;
+		}
+	}
+
+	void InputManager::setHat(char hat, int controllerIndex)
+	{
+		m_controllers[controllerIndex]->hat = hat;
+	}
+
+	bool InputManager::isHatDown(char hat, int controllerIndex)
+	{
+		if ((hat & m_controllers[controllerIndex]->hat) == hat) {
+			return true;
+		}
+		else {
+			return false;
 		}
 	}
 

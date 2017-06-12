@@ -19,8 +19,15 @@ public:
 	void setHealth(float health) { m_health = health; }
 	void addHealth(float amount) { m_health += amount; }
 
+	void bindController(Engine::Controller controller, Engine::InputManager* const inputManager);
+	void bindController(unsigned int controllerIndex, Engine::InputManager* const inputManager);
+
+	const Engine::Controller* getBoundController() const { return m_boundController; }
+	void updateController(Engine::InputManager* const inputManager);
+
 private:
 	Circle_Collision_Clung m_circle;
+	Engine::Controller* m_boundController = nullptr;
 	float m_maxHealth;
 	float m_health;
 };
