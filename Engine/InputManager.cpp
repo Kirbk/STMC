@@ -17,12 +17,16 @@ namespace Engine{
 	InputManager::~InputManager()
 	{
 		for (int i = 0; i < m_controllers.size(); i++) {
-			for (int j = 0; j < m_controllers[i]->axes.size(); i++) {
-				delete m_controllers[i]->axes[j];
-			}
+			if (m_controllers[i] != nullptr) {
+				for (int j = 0; j < m_controllers[i]->axes.size(); j++) {
+					if (m_controllers[i]->axes[j] != nullptr) {
+						delete m_controllers[i]->axes[j];
+					}
+				}
 
-			m_controllers[i]->axes.resize(0);
-			delete m_controllers[i];
+				m_controllers[i]->axes.resize(0);
+				delete m_controllers[i];
+			}
 		}
 
 		m_controllers.resize(0);

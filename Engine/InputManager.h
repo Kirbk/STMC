@@ -47,7 +47,7 @@ namespace Engine{
 		int index = 0;
 		std::unordered_map<unsigned int, bool> buttonMap;
 		std::unordered_map<unsigned int, bool> previousButtonMap;
-		std::vector<Axis*> axes; // Stupid but to far to turn back
+		std::vector<Axis*> axes; // Stupid but too far to turn back
 		char hat = 0;
 	};
 

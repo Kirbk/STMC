@@ -75,22 +75,25 @@ void Player_Clung::update(Engine::InputManager* const inputManager)
 		body->SetLinearVelocity(b2Vec2(body->GetLinearVelocity().x, MAX_SPEED));
 	}
 
-	glm::vec2 mouseCoords = inputManager->getMouseCoords();
-	mouseCoords = m_camera->convertScreenToWorld(mouseCoords);
+	if (m_boundController == nullptr) {
 
-	glm::vec2 centerPosition = glm::vec2(m_position.x, m_position.y);
-	m_direction = glm::normalize(mouseCoords - centerPosition);
+		glm::vec2 mouseCoords = inputManager->getMouseCoords();
+		mouseCoords = m_camera->convertScreenToWorld(mouseCoords);
 
-	const glm::vec2 right(1.0f, 0.0f);
-	float angle = acos(glm::dot(right, m_direction));
-	if (m_direction.y < 0.0f) angle = -angle;
+		glm::vec2 centerPosition = glm::vec2(m_position.x, m_position.y);
+		m_direction = glm::normalize(mouseCoords - centerPosition);
 
-	if (std::to_string(angle) == "-nan(ind)") {
-		m_direction = right;
-		angle = acos(glm::dot(right, m_direction));
+		const glm::vec2 right(1.0f, 0.0f);
+		float angle = acos(glm::dot(right, m_direction));
+		if (m_direction.y < 0.0f) angle = -angle;
+
+		if (std::to_string(angle) == "-nan(ind)") {
+			m_direction = right;
+			angle = acos(glm::dot(right, m_direction));
+		}
+
+		body->SetTransform(body->GetPosition(), angle);
 	}
-
-	body->SetTransform(body->GetPosition(), angle);
 
 	if (m_health > m_maxHealth) {
 		m_health = m_maxHealth;
@@ -141,5 +144,19 @@ void Player_Clung::updateController(Engine::InputManager* const inputManager) {
 		body->ApplyForceToCenter(b2Vec2(0.0f, m_speed * abs(m_boundController->axes[1]->axisValue / 30000.0f)), true);
 	}
 
-	// TODO: Directional input
+	// TODO: Deadzone Checks
+	float x = m_boundController->axes[(int)Engine::XBOX360Axes::rightStickX]->axisValue;
+	float y = m_boundController->axes[(int)Engine::XBOX360Axes::rightStickY]->axisValue;
+
+	glm::vec2 centerPosition(m_position.x, m_position.y);
+	glm::vec2 rotateCoords(x, -y);
+
+	m_direction = glm::normalize(rotateCoords - centerPosition);
+
+	const glm::vec2 right(1.0f, 0.0f);
+	float angle = acos(glm::dot(right, m_direction));
+
+	if (m_direction.y < 0.0f) angle = -angle;
+
+	body->SetTransform(body->GetPosition(), angle);
 }
