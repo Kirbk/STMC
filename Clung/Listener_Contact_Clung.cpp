@@ -23,7 +23,7 @@ void Listener_Contact_Clung::BeginContact(b2Contact* contact)
 	Entity_Clung* entityA = static_cast<Entity_Clung*>(fixtureA->GetUserData());
 	Entity_Clung* entityB = static_cast<Entity_Clung*>(fixtureB->GetUserData());
 
-	if ((entityA != nullptr) || (entityB != nullptr)) {
+	if ((entityA != nullptr) && (entityB != nullptr)) {
 		switch (entityA->getType()) {
 		case EntityCategory::BOUNDARY:
 
@@ -53,8 +53,8 @@ void Listener_Contact_Clung::EndContact(b2Contact* contact)
 
 void Listener_Contact_Clung::playerWithItem(Player_Clung * player, Entity_Clung * item)
 {
-	MedKit_Clung* medkit = static_cast<MedKit_Clung*>(item);
 	if (item->getItemType() == ItemList::MedKit) {
+		MedKit_Clung* medkit = static_cast<MedKit_Clung*>(item);
 		if ((player->getHealth() != player->getMaxHealth()) && (!medkit->isUsed())) {
 			medkit->setUsed();
 			player->addHealth(medkit->getBenefit());

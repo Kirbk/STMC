@@ -12,6 +12,12 @@ Entity_Clung::~Entity_Clung()
 {
 }
 
+void Entity_Clung::init(b2World * world, const glm::vec2 & position, glm::vec2 & direction, float speed, const glm::vec2 & drawDims, glm::vec2 & collisionDims, Engine::Camera2D * camera, Engine::ColorRGBA8 color, Engine::InputManager * inputManager)
+{
+	m_inputManager = inputManager;
+	init(world, position, direction, speed, drawDims, collisionDims, camera, color);
+}
+
 void Entity_Clung::draw(Engine::SpriteBatch & spriteBatch)
 {
 	glm::vec4 destRect;

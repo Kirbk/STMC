@@ -8,7 +8,7 @@
 
 Screen_GP_Clung::Screen_GP_Clung(Engine::Window* window) : m_window(window)
 {
-
+	m_screenIndex = SCREEN_INDEX_GAMEPLAY;
 }
 
 
@@ -21,7 +21,7 @@ int Screen_GP_Clung::getNextScreenIndex() const {
 }
 
 int Screen_GP_Clung::getPreviousScreenIndex() const {
-	return SCREEN_INDEX_NO_SCREEN;
+	return SCREEN_INDEX_MAINMENU;
 }
 
 void Screen_GP_Clung::build()
@@ -51,6 +51,12 @@ void Screen_GP_Clung::onEntry()
 	m_textureProgram.addAttribute("vertexColor");
 	m_textureProgram.addAttribute("vertexUV");
 	m_textureProgram.linkShaders();
+	// Compile our light shader
+	m_lightProgram.compileShaders("Shaders/lightShading.vert", "Shaders/lightShading.frag");
+	m_lightProgram.addAttribute("vertexPosition");
+	m_lightProgram.addAttribute("vertexColor");
+	m_lightProgram.addAttribute("vertexUV");
+	m_lightProgram.linkShaders();
 
 	// Init camera
 	m_camera.init(m_window->getScreenWidth(), m_window->getScreenHeight());
@@ -61,27 +67,28 @@ void Screen_GP_Clung::onEntry()
 	//m_displayCamera.setScale(25.0f);
 
 	// Init player
-	m_player = new Player_Clung(100);
-	m_player->init(m_world.get(), glm::vec2(0.0f), glm::vec2(1.0f, 0.0f), 100.0f, glm::vec2(2.0f), glm::vec2(2.0f), &m_camera, Engine::ColorRGBA8(255, 255, 255, 255));
+	m_entities.push_back(new Player_Clung(100));
+	m_entities.back()->init(m_world.get(), glm::vec2(0.0f), glm::vec2(1.0f, 0.0f), 150.0f, glm::vec2(2.0f), glm::vec2(2.0f), &m_camera, Engine::ColorRGBA8(255, 255, 255, 255), &m_game->inputManager);
+	m_player = static_cast<Player_Clung*>(m_entities.back());
+	m_allEntities.push_back(m_entities.back());
 
 	m_items.push_back(new MedKit_Clung(20));
 	m_items.back()->init(m_world.get(), glm::vec2(6.0f, 5.0f), glm::vec2(1.0f, 0.0f), 0.0f, glm::vec2(1.0f), glm::vec2(1.0f), &m_camera, Engine::ColorRGBA8(255, 255, 255, 255));
+	m_allEntities.push_back(m_items.back());
 
-	m_game->inputManager.setControllerDeadZone(3200);
+
+	m_lights.push_back(new Light_Clung(glm::vec2(1, 1), 10, Engine::ColorRGBA8(255, 255, 255, 255)));
 }
 
 void Screen_GP_Clung::onExit()
 {
-	for (int i = 0; i < m_entities.size(); i++) {
-		delete m_entities[i];
-	}
+	delete m_player;
+	m_player = nullptr;
 
-	for (int i = 0; i < m_items.size(); i++) {
-		delete m_items[i];
-	}
-
-	m_entities.resize(0);
-	m_items.resize(0);
+	m_world.reset();
+	m_entities.clear();
+	m_items.clear();
+	m_lights.clear();
 
 	m_debugRenderer.dispose();
 }
@@ -93,13 +100,13 @@ void Screen_GP_Clung::update()
 	m_displayCamera.update();
 	checkInput();
 
-	m_player->update(&m_game->inputManager);
-
-	for (Entity_Clung* e : m_entities) {
-		e->update();
+	for (int i = 0; i < m_entities.size(); i++) {
+		if (m_entities[i] != nullptr) {
+			m_entities[i]->update();
+		}
 	}
 	
-	for (Entity_Clung* e : m_items) {
+	for (Item_Clung* e : m_items) {
 		if (e != nullptr) {
 			if (e->isDestroyed()) {
 				m_items.erase(std::remove(m_items.begin(), m_items.end(), e), m_items.end());
@@ -111,8 +118,13 @@ void Screen_GP_Clung::update()
 		}
 	}
 
+	for (Light_Clung* l : m_lights) {
+		l->update(m_allEntities);
+	}
+
 	// Update physics
-	m_world->Step(1.0f / 60.0f, 32, 16);
+	if (m_world.get() != nullptr)
+		m_world->Step(1.0f / 60.0f, 32, 16);
 }
 
 void Screen_GP_Clung::draw()
@@ -133,15 +145,17 @@ void Screen_GP_Clung::draw()
 	glUniformMatrix4fv(pUniform, 1, GL_FALSE, &projectionMatrix[0][0]);
 
 	m_spriteBatch.begin();
-
-	m_player->draw(m_spriteBatch);
 	
 	for (Entity_Clung* e : m_entities) {
-		e->draw(m_spriteBatch);
+		if (m_camera.isBoxInView(e->getPosition() - (e->getDrawDims() / 2.0f), e->getDrawDims())) {
+			e->draw(m_spriteBatch);
+		}
 	}
 
-	for (Entity_Clung* e : m_items) {
-		e->draw(m_spriteBatch);
+	for (Item_Clung* e : m_items) {
+		if (m_camera.isBoxInView(e->getPosition() - (e->getDrawDims() / 2.0f), e->getDrawDims())) {
+			e->draw(m_spriteBatch);
+		}
 	}
 
 	m_spriteBatch.end();
@@ -197,10 +211,14 @@ void Screen_GP_Clung::renderDebug(glm::mat4& projectionMatrix) {
 		}
 	}
 
-	for (Entity_Clung* e : m_items) {
+	for (Item_Clung* e : m_items) {
 		if (e->getItemType() == ItemList::MedKit) {
 			static_cast<MedKit_Clung*>(e)->drawDebug(m_debugRenderer);
 		}
+	}
+
+	for (Light_Clung* l : m_lights) {
+		l->drawDebug(m_debugRenderer);
 	}
 
 	m_debugRenderer.end();

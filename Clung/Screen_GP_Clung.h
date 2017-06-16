@@ -16,6 +16,8 @@
 #include "Player_Clung.h"
 #include "MedKit_Clung.h"
 #include "Listener_Contact_Clung.h"
+#include "Screen_Indices_Clung.h"
+#include "Light_Clung.h"
 
 #define DEBUG 1
 
@@ -42,6 +44,7 @@ private:
 	void renderDebugText(glm::mat4& projectionMatrix);
 
 	Engine::GLSLProgram m_textureProgram;
+	Engine::GLSLProgram m_lightProgram;
 	Engine::Camera2D m_camera;
 	Engine::Camera2D m_displayCamera;
 	Engine::SpriteBatch m_spriteBatch;
@@ -55,7 +58,10 @@ private:
 
 	Player_Clung* m_player;
 	std::vector<Entity_Clung*> m_entities;
-	std::vector<Entity_Clung*> m_items;
+	std::vector<Item_Clung*> m_items;
+	std::vector<Light_Clung*> m_lights;
+
+	std::vector<Entity_Clung*> m_allEntities;
 
 	bool m_debug = DEBUG;
 	int m_currentLevel = 0;

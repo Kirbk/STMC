@@ -9,14 +9,14 @@ namespace Engine{
 		SDL_JoystickEventState(SDL_ENABLE);
 
 		for (int i = 0; i < MAX_CONTROLLERS; i++) {
-			m_controllers.push_back(nullptr);
+			m_controllers[i] = nullptr;
 		}
 	}
 
 
 	InputManager::~InputManager()
 	{
-		for (int i = 0; i < m_controllers.size(); i++) {
+		for (int i = 0; i < sizeof(m_controllers) / sizeof(Controller*); i++) {
 			if (m_controllers[i] != nullptr) {
 				for (int j = 0; j < m_controllers[i]->axes.size(); j++) {
 					if (m_controllers[i]->axes[j] != nullptr) {
@@ -28,8 +28,6 @@ namespace Engine{
 				delete m_controllers[i];
 			}
 		}
-
-		m_controllers.resize(0);
 	}
 
 	void InputManager::update() {
@@ -41,10 +39,19 @@ namespace Engine{
 		for (int i = 0; i < MAX_CONTROLLERS; i++) {
 			if (m_controllers[i] != nullptr) {
 				if (!SDL_JoystickGetAttached(m_controllers[i]->joystick)) {
+					for (int j = 0; j < m_controllers[i]->axes.size(); j++) {
+						delete m_controllers[i]->axes[j];
+					}
+					m_controllers[i]->isBinded = false;
+
+					m_controllers[i]->axes.resize(0);
+
 					SDL_JoystickClose(m_controllers[i]->joystick);
+					delete m_controllers[i];
 					m_controllers[i] = nullptr;
 				}
 			}
+
 			if (m_controllers[i] != nullptr) {
 				for (auto& it : m_controllers[i]->buttonMap) {
 					m_controllers[i]->previousButtonMap[it.first] = it.second;
@@ -91,40 +98,42 @@ namespace Engine{
 
 	void InputManager::buttonPressed(unsigned int buttonID, unsigned int controllerIndex)
 	{
-		m_controllers[controllerIndex]->buttonMap[buttonID] = true;
+		m_controllers[m_totalControllers - controllerIndex - 1]->buttonMap[buttonID] = true;
 	}
 
 	void InputManager::buttonReleased(unsigned int buttonID, unsigned int controllerIndex)
 	{
-		m_controllers[controllerIndex]->buttonMap[buttonID] = false;
+		m_controllers[m_totalControllers - controllerIndex - 1]->buttonMap[buttonID] = false;
 	}
 
 	bool InputManager::isButtonDown(unsigned int buttonID, unsigned int controllerIndex)
 	{
-		auto it = m_controllers[controllerIndex]->buttonMap.find(buttonID);
-		if (it != m_controllers[controllerIndex]->buttonMap.end())
+		auto it = m_controllers[m_totalControllers - controllerIndex - 1]->buttonMap.find(buttonID);
+		if (it != m_controllers[m_totalControllers - controllerIndex - 1]->buttonMap.end())
 			return it->second;
 		else
 			return false;
 	}
 
-	Controller* InputManager::addController()
+	void InputManager::addController()
 	{
 		for (int i = 0; i < MAX_CONTROLLERS; i++) {
+			int cIndex = m_totalControllers - i;
 			if (m_controllers[i] == nullptr) {
-				Controller* c = new Controller();
-				c->index = i;
-				c->joystick = SDL_JoystickOpen(i);
-				c->axes.resize(6, nullptr);
-				m_controllers[i] = c;
+				m_controllers[i] = new Controller();
+				m_controllers[i]->index = i;
+				m_controllers[i]->SDL_Index = m_totalControllers;
+				m_controllers[i]->joystick = SDL_JoystickOpen(i);
 
-				return m_controllers[i];
-				delete c;
+				//std::cout << i << std::endl;
+
+				m_controllers[i]->axes.resize(6, nullptr);
+
+				m_totalControllers++;
+
 				break;
 			}
 		}
-
-		return nullptr;
 	}
 
 	// Deprecated
@@ -143,28 +152,55 @@ namespace Engine{
 
 	void InputManager::setAxisValue(unsigned int controllerIndex, unsigned int axis, int value)
 	{
-		if (m_controllers[controllerIndex]->axes[axis] != nullptr) {
-			m_controllers[controllerIndex]->axes[axis]->axisValue = (int)value;
+		int cIndex = m_totalControllers;
 
-			//std::printf("%i\n", (int) value);
+		
+
+
+		for (Controller* c : m_controllers) {
+			if (c != nullptr) {
+				if (c->SDL_Index == controllerIndex) {
+					std::cout << c->SDL_Index << " | " << controllerIndex << " | " << c->index << std::endl;
+
+					if (c->axes[axis] != nullptr) {
+						c->axes[axis]->axisValue = (int)value;
+					}
+					else {
+						c->axes[axis] = new Axis();
+						c->axes[axis]->axisID = axis;
+						c->axes[axis]->axisValue = value;
+						c->axes[axis]->deadZone = m_controllerDeadZone;
+					}
+				}
+			}
 		}
-		else {
-			Axis* tempAxis = new Axis();
-			tempAxis->axisID = axis;
-			tempAxis->axisValue = value;
-			tempAxis->deadZone = m_controllerDeadZone;
-			m_controllers[controllerIndex]->axes[axis] = tempAxis;
-		}
+
+
+		/*if (m_controllers[cIndex] != nullptr) {
+			//std::cout << axis << std::endl;
+			if (m_controllers[cIndex]->axes[axis] != nullptr) {
+				m_controllers[cIndex]->axes[axis]->axisValue = (int)value;
+
+
+				//std::printf("%i\n", controllerIndex);
+			}
+			else {
+				m_controllers[cIndex]->axes[axis] = new Axis();
+				m_controllers[cIndex]->axes[axis]->axisID = axis;
+				m_controllers[cIndex]->axes[axis]->axisValue = value;
+				m_controllers[cIndex]->axes[axis]->deadZone = m_controllerDeadZone;
+			}
+		}*/
 	}
 
 	void InputManager::setHat(char hat, int controllerIndex)
 	{
-		m_controllers[controllerIndex]->hat = hat;
+		m_controllers[m_totalControllers - controllerIndex - 1]->hat = hat;
 	}
 
 	bool InputManager::isHatDown(char hat, int controllerIndex)
 	{
-		if ((hat & m_controllers[controllerIndex]->hat) == hat) {
+		if ((hat & m_controllers[m_totalControllers - controllerIndex - 1]->hat) == hat) {
 			return true;
 		}
 		else {

@@ -10,7 +10,7 @@ public:
 
 	// Inherited via Entity_Clung
 	virtual void init(b2World * world, const glm::vec2 & position, glm::vec2& direction, float speed, const glm::vec2 & drawDims, glm::vec2 & collisionDims, Engine::Camera2D* camera, Engine::ColorRGBA8 color) override;
-	virtual void update(Engine::InputManager* const inputManager = nullptr) override;
+	virtual void update() override;
 	void drawDebug(Engine::DebugRenderer& debugRenderer);
 
 	const Circle_Collision_Clung& getCircle() const { return m_circle; }
@@ -30,5 +30,6 @@ private:
 	Engine::Controller* m_boundController = nullptr;
 	float m_maxHealth;
 	float m_health;
+	float m_controllerPreviousX, m_controllerPreviousY;
 };
 

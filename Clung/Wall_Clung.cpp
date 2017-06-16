@@ -25,7 +25,7 @@ void Wall_Clung::init(b2World * world, const glm::vec2 & position, glm::vec2 & d
 	m_type = EntityCategory::BOUNDARY;
 }
 
-void Wall_Clung::update(Engine::InputManager * const inputManager)
+void Wall_Clung::update()
 {
 	m_position.x = m_box.getBody()->GetPosition().x;
 	m_position.y = m_box.getBody()->GetPosition().y;

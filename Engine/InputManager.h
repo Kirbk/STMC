@@ -45,10 +45,12 @@ namespace Engine{
 	struct Controller {
 		SDL_Joystick* joystick;
 		int index = 0;
+		int SDL_Index = 0;
 		std::unordered_map<unsigned int, bool> buttonMap;
 		std::unordered_map<unsigned int, bool> previousButtonMap;
 		std::vector<Axis*> axes; // Stupid but too far to turn back
 		char hat = 0;
+		bool isBinded = false;
 	};
 
 	class InputManager
@@ -79,11 +81,11 @@ namespace Engine{
 		}
 
 		float getScrollAmount() const { return m_scrollAmount; }
-		Controller* addController();
+		void addController();
 		void removeContoller(int index);
 
 		Controller* getController(int index) { 
-			if (m_controllers.size() <= MAX_CONTROLLERS) {
+			if (sizeof(m_controllers) / sizeof(Controller*) <= MAX_CONTROLLERS) {
 				return m_controllers[index];
 			}
 			else {
@@ -99,6 +101,8 @@ namespace Engine{
 		void setHat(char hat, int controllerIndex);
 		bool isHatDown(char hat, int controllerIndex);
 
+		const int getMaxControllers() const { return MAX_CONTROLLERS; }
+
 	private:
 		bool wasKeyDown(unsigned int keyID);
 		bool m_isScrolling = false;
@@ -108,9 +112,10 @@ namespace Engine{
 
 		glm::vec2 _mouseCoords;
 		float m_scrollAmount = 0;
-		std::vector<Controller*> m_controllers;
-		float m_controllerDeadZone = 0;
 		int MAX_CONTROLLERS = 4;
+		Controller* m_controllers[4];
+		float m_controllerDeadZone = 0;
+		int m_totalControllers = 0;
 	};
 
 }

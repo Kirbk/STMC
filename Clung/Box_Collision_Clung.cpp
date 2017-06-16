@@ -1,6 +1,7 @@
 #include "Box_Collision_Clung.h"
 
 #include <iostream>
+
 #include "Entity_Clung.h"
 
 
@@ -25,6 +26,12 @@ void Box_Collision_Clung::init(b2World * world, b2BodyType type, Entity_Clung* p
 	bodyDef.type = type;
 	bodyDef.position.Set(position.x, position.y);
 	bodyDef.fixedRotation = fixedRotation;
+
+	const glm::vec2 right(1.0f, 0.0f);
+	float angle = acos(glm::dot(right, m_parent->getDirection()) / (glm::length(right) * glm::length(m_parent->getDirection())));
+	if (m_parent->getDirection().y < 0.0f) angle = -angle;
+	
+	bodyDef.angle = angle;
 	m_body = world->CreateBody(&bodyDef);
 
 	m_body->SetUserData(parent);
@@ -50,4 +57,19 @@ void Box_Collision_Clung::drawDebug(Engine::DebugRenderer & debugRenderer)
 	destRect.w = m_dimensions.y;
 
 	debugRenderer.drawBox(destRect, Engine::ColorRGBA8(255, 255, 255, 255), m_body->GetAngle());
+
+	float halfX = m_parent->getDrawDims().x / 2.0f;
+	float halfY = 0;
+	glm::vec2 pos;
+	pos.x = (halfX * cos(m_body->GetAngle()) - halfY * sin(m_body->GetAngle())) + m_parent->getPosition().x;
+	pos.y = (halfX * sin(m_body->GetAngle()) + halfY * cos(m_body->GetAngle())) + m_parent->getPosition().y;
+
+	debugRenderer.drawLine(m_parent->getPosition(), pos, Engine::ColorRGBA8(255, 255, 255, 255));
+}
+
+glm::vec2 rotatePoint(glm::vec2 pos, float angle) {
+	glm::vec2 newv;
+	newv.x = pos.x * cos(angle) - pos.y * sin(angle);
+	newv.y = pos.x * sin(angle) + pos.y * cos(angle);
+	return newv;
 }

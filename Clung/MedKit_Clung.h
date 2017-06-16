@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Entity_Clung.h"
+#include "Item_Clung.h"
 #include "Box_Collision_Clung.h"
 
-class MedKit_Clung : public Entity_Clung
+class MedKit_Clung : public Item_Clung
 {
 public:
 	MedKit_Clung(float benefit = 0);
@@ -11,7 +11,7 @@ public:
 
 	// Inherited via Entity_Clung
 	virtual void init(b2World * world, const glm::vec2 & position, glm::vec2 & direction, float speed, const glm::vec2 & drawDims, glm::vec2 & collisionDims, Engine::Camera2D * camera, Engine::ColorRGBA8 color) override;
-	virtual void update(Engine::InputManager * const inputManager = nullptr) override;
+	virtual void update() override;
 
 	void drawDebug(Engine::DebugRenderer& debugRenderer);
 

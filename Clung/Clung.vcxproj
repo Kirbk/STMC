@@ -149,11 +149,14 @@
     <ClCompile Include="Box_Collision_Clung.cpp" />
     <ClCompile Include="Circle_Collision_Clung.cpp" />
     <ClCompile Include="Entity_Clung.cpp" />
+    <ClCompile Include="Item_Clung.cpp" />
+    <ClCompile Include="Light_Clung.cpp" />
     <ClCompile Include="Listener_Contact_Clung.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MedKit_Clung.cpp" />
     <ClCompile Include="Player_Clung.cpp" />
     <ClCompile Include="Screen_GP_Clung.cpp" />
+    <ClCompile Include="Screen_Start_Clung.cpp" />
     <ClCompile Include="Wall_Clung.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -161,10 +164,14 @@
     <ClInclude Include="Box_Collision_Clung.h" />
     <ClInclude Include="Circle_Collision_Clung.h" />
     <ClInclude Include="Entity_Clung.h" />
+    <ClInclude Include="Item_Clung.h" />
+    <ClInclude Include="Light_Clung.h" />
     <ClInclude Include="Listener_Contact_Clung.h" />
     <ClInclude Include="MedKit_Clung.h" />
     <ClInclude Include="Player_Clung.h" />
     <ClInclude Include="Screen_GP_Clung.h" />
+    <ClInclude Include="Screen_Indices_Clung.h" />
+    <ClInclude Include="Screen_Start_Clung.h" />
     <ClInclude Include="Wall_Clung.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

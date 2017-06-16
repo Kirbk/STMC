@@ -27,6 +27,7 @@ void MedKit_Clung::init(b2World * world, const glm::vec2 & position, glm::vec2 &
 	m_box.init(world, b2_dynamicBody, this, position, collisionDims);
 	m_type = EntityCategory::ITEM;
 	m_itemType = ItemList::MedKit;
+	m_shape = Shape::RECTANGLE;
 	m_item = true;
 	//m_box.getFixture()->SetSensor(true);
 	
@@ -41,8 +42,10 @@ void MedKit_Clung::init(b2World * world, const glm::vec2 & position, glm::vec2 &
 	body->SetAngularDamping(0.8f);
 }
 
-void MedKit_Clung::update(Engine::InputManager * const inputManager)
+void MedKit_Clung::update()
 {
+	m_angle = m_box.getBody()->GetAngle();
+
 	m_position.x = m_box.getBody()->GetPosition().x;
 	m_position.y = m_box.getBody()->GetPosition().y;
 
