@@ -68,16 +68,13 @@ void Screen_GP_Clung::onEntry()
 
 	// Init player
 	m_entities.push_back(new Player_Clung(100));
-	m_entities.back()->init(m_world.get(), glm::vec2(0.0f), glm::vec2(1.0f, 0.0f), 150.0f, glm::vec2(2.0f), glm::vec2(2.0f), &m_camera, Engine::ColorRGBA8(255, 255, 255, 255), &m_game->inputManager);
+	m_entities.back()->init(m_world.get(), glm::vec2(0.0f), glm::vec2(1.0f, 0.0f), 150.0f, glm::vec2(2.0f), glm::vec2(2.0f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f), &m_camera, Engine::ColorRGBA8(255, 255, 255, 255), &m_game->inputManager);
 	m_player = static_cast<Player_Clung*>(m_entities.back());
 	m_allEntities.push_back(m_entities.back());
 
 	m_items.push_back(new MedKit_Clung(20));
-	m_items.back()->init(m_world.get(), glm::vec2(6.0f, 5.0f), glm::vec2(1.0f, 0.0f), 0.0f, glm::vec2(1.0f), glm::vec2(1.0f), &m_camera, Engine::ColorRGBA8(255, 255, 255, 255));
+	m_items.back()->init(m_world.get(), glm::vec2(6.0f, 5.0f), glm::vec2(1.0f, 0.0f), 0.0f, glm::vec2(1.0f), glm::vec2(1.0f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f), &m_camera, Engine::ColorRGBA8(255, 255, 255, 255));
 	m_allEntities.push_back(m_items.back());
-
-
-	m_lights.push_back(new Light_Clung(glm::vec2(1, 1), 10, Engine::ColorRGBA8(255, 255, 255, 255)));
 }
 
 void Screen_GP_Clung::onExit()

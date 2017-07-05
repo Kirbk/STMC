@@ -96,6 +96,11 @@ void GameplayScreen::onExit() {
 	m_debugRenderer.dispose();
 	m_boxes.clear();
 	m_world.reset();
+	m_textureProgram.dispose();
+	m_spriteBatch.dispose();
+	m_lightProgram.dispose();
+	m_boxes.clear();
+	m_boxes.resize(0);
 }
 
 void GameplayScreen::update() {
@@ -216,6 +221,6 @@ void GameplayScreen::checkInput() {
 }
 
 bool GameplayScreen::onExitClicked(const CEGUI::EventArgs& e) {
-	m_currentState = Engine::ScreenState::EXIT_APPLICATION;
+	m_currentState = Engine::ScreenState::CHANGE_PREVIOUS;
 	return true;
 }

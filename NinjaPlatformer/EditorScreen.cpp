@@ -82,7 +82,6 @@ void EditorScreen::onEntry() {
 }
 
 void EditorScreen::onExit() {
-
 	for (auto& item : m_saveListBoxItems) {
 		// We don't have to call delete since removeItem does it for us
 		m_saveWindowCombobox->removeItem(item);
@@ -103,6 +102,7 @@ void EditorScreen::onExit() {
 	m_world.reset();
 
 	m_gui.destroy();
+	
 }
 
 void EditorScreen::update() {

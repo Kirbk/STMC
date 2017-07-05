@@ -57,6 +57,9 @@
     <ClCompile Include="Light_Clung.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="LevelReadWrite_Clung.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App_Clung.h">
@@ -96,6 +99,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Light_Clung.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LevelReadWrite_Clung.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

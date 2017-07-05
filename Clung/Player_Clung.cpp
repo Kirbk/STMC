@@ -16,9 +16,10 @@ Player_Clung::~Player_Clung()
 {
 }
 
-void Player_Clung::init(b2World * world, const glm::vec2 & position, glm::vec2 & direction, float speed, const glm::vec2 & drawDims, glm::vec2 & collisionDims, Engine::Camera2D * camera, Engine::ColorRGBA8 color)
+void Player_Clung::init(b2World * world, const glm::vec2 & position, glm::vec2 & direction, float speed, const glm::vec2 & drawDims, glm::vec2 & collisionDims, glm::vec4& uvRect, Engine::Camera2D * camera, Engine::ColorRGBA8 color)
 {
-	m_textureID = Engine::ResourceManager::getTexture("Assets/textures/placeholder.png").id;
+	Engine::GLTexture texture = Engine::ResourceManager::getTexture("Assets/textures/placeholder.png");
+	m_texture.init(texture, glm::ivec2(1, 1));
 	m_type = EntityCategory::PLAYER;
 	m_color = color;
 	m_speed = speed;
@@ -26,6 +27,8 @@ void Player_Clung::init(b2World * world, const glm::vec2 & position, glm::vec2 &
 	m_drawDims = drawDims;
 	m_shape = Shape::ROUND;
 	m_circle.init(world, this, position, collisionDims, 1.0f, 0.1f, true);
+	m_collisionDims = collisionDims;
+	m_uvRect = uvRect;
 
 	b2Filter filter = m_circle.getFixtures()[0]->GetFilterData();
 	filter.categoryBits = EntityCategory::PLAYER;

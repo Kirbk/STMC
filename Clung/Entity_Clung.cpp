@@ -12,10 +12,10 @@ Entity_Clung::~Entity_Clung()
 {
 }
 
-void Entity_Clung::init(b2World * world, const glm::vec2 & position, glm::vec2 & direction, float speed, const glm::vec2 & drawDims, glm::vec2 & collisionDims, Engine::Camera2D * camera, Engine::ColorRGBA8 color, Engine::InputManager * inputManager)
+void Entity_Clung::init(b2World * world, const glm::vec2 & position, glm::vec2 & direction, float speed, const glm::vec2 & drawDims, glm::vec2 & collisionDims, glm::vec4& uvRect, Engine::Camera2D * camera, Engine::ColorRGBA8 color, Engine::InputManager * inputManager)
 {
 	m_inputManager = inputManager;
-	init(world, position, direction, speed, drawDims, collisionDims, camera, color);
+	init(world, position, direction, speed, drawDims, collisionDims, uvRect, camera, color);
 }
 
 void Entity_Clung::draw(Engine::SpriteBatch & spriteBatch)
@@ -28,5 +28,5 @@ void Entity_Clung::draw(Engine::SpriteBatch & spriteBatch)
 	destRect.z = m_drawDims.x;
 	destRect.w = m_drawDims.y;
 
-	spriteBatch.draw(destRect, glm::vec4(0.0f, 0.0f, 1.0f, 1.0f), m_textureID, 0.0f, m_color, m_direction);
+	spriteBatch.draw(destRect, m_uvRect, (GLuint)m_texture.texture.id, 0.0f, m_color, m_direction);
 }

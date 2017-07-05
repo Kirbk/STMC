@@ -43,6 +43,7 @@ std::vector<glm::vec2> Light_Clung::castRays()
 		switch (e->getShape()) {
 		case Shape::RECTANGLE:
 			{
+			
 				glm::vec2 halfDims = e->getDrawDims() / 2.0f;
 
 				glm::vec2 tlPoint(-halfDims.x, halfDims.y);
@@ -60,6 +61,7 @@ std::vector<glm::vec2> Light_Clung::castRays()
 				glm::vec4 rightFace(trPoint.x, trPoint.y, brPoint.x, brPoint.y);
 				glm::vec4 leftFace(tlPoint.x, tlPoint.y, blPoint.x, blPoint.y);
 
+				/*
 				glm::vec2 tl = glm::normalize(tlPoint - position);
 				glm::vec2 bl = glm::normalize(blPoint - position);
 				glm::vec2 br = glm::normalize(brPoint - position);
@@ -73,6 +75,33 @@ std::vector<glm::vec2> Light_Clung::castRays()
 				points.push_back(bl);
 				points.push_back(br);
 				points.push_back(tr);
+				*/
+
+				std::vector<Point> _points_;
+
+				Point topLeft;
+				topLeft.location = tlPoint;
+				topLeft.relativeLocation = RelativeLocation::TOP_LEFT;
+
+				Point bottomLeft;
+				bottomLeft.location = blPoint;
+				bottomLeft.relativeLocation = RelativeLocation::BOTTOM_LEFT;
+
+				Point bottomRight;
+				bottomRight.location = brPoint;
+				bottomRight.relativeLocation = RelativeLocation::BOTTOM_RIGHT;
+
+				Point topRight;
+				topRight.location = trPoint;
+				topRight.relativeLocation = RelativeLocation::TOP_RIGHT;
+
+
+				for (Point pt : _points_) {
+					if (pt.relativeLocation == RelativeLocation::TOP_LEFT) {
+						
+					}
+				}
+
 			}
 			break;
 
@@ -99,32 +128,3 @@ glm::vec2 Light_Clung::rotatePoint(glm::vec2 pos, float angle)
 	return newvec;
 }
 
-int get_line_intersection(float p0_x, float p0_y, float p1_x, float p1_y,
-	float p2_x, float p2_y, float p3_x, float p3_y)
-{
-	float s02_x, s02_y, s10_x, s10_y, s32_x, s32_y, s_numer, t_numer, denom, t;
-	s10_x = p1_x - p0_x;
-	s10_y = p1_y - p0_y;
-	s32_x = p3_x - p2_x;
-	s32_y = p3_y - p2_y;
-
-	denom = s10_x * s32_y - s32_x * s10_y;
-	if (denom == 0)
-		return 0; // Collinear
-	bool denomPositive = denom > 0;
-
-	s02_x = p0_x - p2_x;
-	s02_y = p0_y - p2_y;
-	s_numer = s10_x * s02_y - s10_y * s02_x;
-	if ((s_numer < 0) == denomPositive)
-		return 0; // No collision
-
-	t_numer = s32_x * s02_y - s32_y * s02_x;
-	if ((t_numer < 0) == denomPositive)
-		return 0; // No collision
-
-	if (((s_numer > denom) == denomPositive) || ((t_numer > denom) == denomPositive))
-		return 0; // No collision
-				  // Collision detected
-	return 1;
-}

@@ -12,9 +12,10 @@ Wall_Clung::~Wall_Clung()
 {
 }
 
-void Wall_Clung::init(b2World * world, const glm::vec2 & position, glm::vec2 & direction, float speed, const glm::vec2 & drawDims, glm::vec2 & collisionDims, Engine::Camera2D * camera, Engine::ColorRGBA8 color)
+void Wall_Clung::init(b2World * world, const glm::vec2 & position, glm::vec2 & direction, float speed, const glm::vec2 & drawDims, glm::vec2 & collisionDims, glm::vec4& uvRect, Engine::Camera2D * camera, Engine::ColorRGBA8 color)
 {
-	m_textureID = Engine::ResourceManager::getTexture("Assets/textures/wall.png").id;
+	Engine::GLTexture texture = Engine::ResourceManager::getTexture("Assets/textures/wall.png");
+	m_texture.init(texture, glm::ivec2(1, 1));
 	m_position = position;
 	m_direction = direction;
 	m_speed = speed;

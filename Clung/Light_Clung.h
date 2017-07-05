@@ -6,6 +6,17 @@
 
 #include "Entity_Clung.h"
 
+enum class RelativeLocation {
+	TOP_LEFT,
+	BOTTOM_LEFT,
+	TOP_RIGHT,
+	BOTTOM_RIGHT
+};
+
+struct Point {
+	glm::vec2 location;
+	RelativeLocation relativeLocation;
+};
 
 class Light_Clung
 {

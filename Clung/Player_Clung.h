@@ -9,7 +9,7 @@ public:
 	~Player_Clung();
 
 	// Inherited via Entity_Clung
-	virtual void init(b2World * world, const glm::vec2 & position, glm::vec2& direction, float speed, const glm::vec2 & drawDims, glm::vec2 & collisionDims, Engine::Camera2D* camera, Engine::ColorRGBA8 color) override;
+	virtual void init(b2World * world, const glm::vec2 & position, glm::vec2& direction, float speed, const glm::vec2 & drawDims, glm::vec2 & collisionDims, glm::vec4& uvRect, Engine::Camera2D* camera, Engine::ColorRGBA8 color) override;
 	virtual void update() override;
 	void drawDebug(Engine::DebugRenderer& debugRenderer);
 

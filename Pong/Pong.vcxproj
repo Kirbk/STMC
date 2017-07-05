@@ -20,9 +20,9 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{4BD09BF9-2C0B-4198-89F6-B4D9F14B12A9}</ProjectGuid>
+    <ProjectGuid>{6F1386B0-EF29-40C9-BD4A-8C1679D51345}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>Clung</RootNamespace>
+    <RootNamespace>Pong</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -80,6 +80,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(SolutionDir);$(SolutionDir)dependencies\Debug\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)x64\Debug;$(SolutionDir)dependencies\Debug\lib\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -123,6 +125,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
+      <AdditionalDependencies>glew32s.lib;glew32.lib;opengl32.lib;SDL2.lib;SDL2main.lib;SDL2_ttf.lib;SDL2_image.lib;SDL2_mixer.lib;Engine.lib;Box2D.lib;CEGUIBase-0_d.lib;CEGUIOpenGLRenderer-0_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -142,39 +145,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <Text Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="App_Clung.cpp" />
-    <ClCompile Include="Box_Collision_Clung.cpp" />
-    <ClCompile Include="Circle_Collision_Clung.cpp" />
-    <ClCompile Include="Entity_Clung.cpp" />
-    <ClCompile Include="Item_Clung.cpp" />
-    <ClCompile Include="LevelReadWrite_Clung.cpp" />
-    <ClCompile Include="Light_Clung.cpp" />
-    <ClCompile Include="Listener_Contact_Clung.cpp" />
+    <ClCompile Include="App_Pong.cpp" />
+    <ClCompile Include="Ball_Pong.cpp" />
+    <ClCompile Include="Contact_Listener_Pong.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="MedKit_Clung.cpp" />
-    <ClCompile Include="Player_Clung.cpp" />
-    <ClCompile Include="Screen_GP_Clung.cpp" />
-    <ClCompile Include="Screen_Start_Clung.cpp" />
-    <ClCompile Include="Wall_Clung.cpp" />
+    <ClCompile Include="Paddle_Pong.cpp" />
+    <ClCompile Include="Screen_GP_Pong.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="App_Clung.h" />
-    <ClInclude Include="Box_Collision_Clung.h" />
-    <ClInclude Include="Circle_Collision_Clung.h" />
-    <ClInclude Include="Entity_Clung.h" />
-    <ClInclude Include="Item_Clung.h" />
-    <ClInclude Include="LevelReadWrite_Clung.h" />
-    <ClInclude Include="Light_Clung.h" />
-    <ClInclude Include="Listener_Contact_Clung.h" />
-    <ClInclude Include="MedKit_Clung.h" />
-    <ClInclude Include="Player_Clung.h" />
-    <ClInclude Include="Screen_GP_Clung.h" />
-    <ClInclude Include="Screen_Indices_Clung.h" />
-    <ClInclude Include="Screen_Start_Clung.h" />
-    <ClInclude Include="Wall_Clung.h" />
+    <ClInclude Include="App_Pong.h" />
+    <ClInclude Include="Ball_Pong.h" />
+    <ClInclude Include="Contact_Listener_Pong.h" />
+    <ClInclude Include="Paddle_Pong.h" />
+    <ClInclude Include="Screen_GP_Pong.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
