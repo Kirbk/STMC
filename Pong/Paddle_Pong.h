@@ -41,8 +41,14 @@ public:
 	const Engine::TileSheet&   getTexture()       const { return m_texture; }
 	const bool&                getFixedRotation() const { return m_fixedRotation; }
 	const bool&                getIsDynamic()     const { return m_isDynamic; }
+
+
+	const int getScore() const { return m_score; }
+	void setScore(int score) { m_score = score; }
+	void addPoint() { m_score += 1; }
+
 private:
-	int m_id;
+	int m_score = 0, m_id;
 	glm::vec4 m_uvRect;
 	b2Body* m_body = nullptr;
 	b2Fixture* m_fixture = nullptr;

@@ -12,6 +12,7 @@
 
 #include "Paddle_Pong.h"
 #include "Ball_Pong.h"
+#include "Border_Pong.h"
 #include "Contact_Listener_Pong.h"
 
 class Screen_GP_Pong : public Engine::IGameScreen
@@ -32,6 +33,7 @@ public:
 
 private:
 	void checkInput();
+	void renderGUI(glm::mat4 & projectionMatrix);
 
 	Engine::GLSLProgram m_textureProgram;
 	Engine::Camera2D m_camera;
@@ -48,4 +50,5 @@ private:
 	Paddle_Pong m_paddle1;
 	Paddle_Pong m_paddle2;
 	Ball_Pong m_ball;
+	Border_Pong m_border;
 };
